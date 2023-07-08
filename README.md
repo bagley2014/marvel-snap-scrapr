@@ -3,7 +3,7 @@
 # Marvel SNAP Scrapr
 
 Scraper for https://marvelsnapzone.com to retrieve metadata of Marvel SNAP cards.
-This is a fork of https://github.com/vlmaier/marvel-snap-scrapr.
+This is a fork of [vlmaier/marvel-snap-scrapr](https://github.com/vlmaier/marvel-snap-scrapr).
 
 ## How it works
 
@@ -15,4 +15,5 @@ In the end, a dictionary of all available cards is created and saved to `data.js
 ## How to use it
 
 Ensure Python is installed, then in the project's root directory, run `pip install -r requirements.txt`.
-In the directory where the data should be saved (e.g. src/assets), run `python scrapr.py`.
+
+The script is run like `python scrapr.py` and, unless modified, will save the files in a subdirectory of the working directory. Therefore, it's best to run the script from the directory the output files should be in (e.g. src/assets) rather than running the script from its own root directory.
