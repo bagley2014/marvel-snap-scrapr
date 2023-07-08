@@ -1,3 +1,4 @@
+import json
 import re
 import requests
 import os
@@ -7,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from threading import Thread
 from datetime import datetime
 
-CARDS_API_URL = "http://localhost:8080/v1/cards"
+OUTPUT_DIR = 'marvel-snap-cards'
 MARVELSNAPZONE_URL = 'https://marvelsnapzone.com/cards'
 
 
@@ -30,6 +31,7 @@ def scrap():
     characters = []
     for link in links:
         character = {
+            'id': link['data-carddefid'],
             # Capitalize every word.
             'name': link['data-name'].title(),
             'cost': link['data-cost'],
@@ -44,10 +46,6 @@ def scrap():
         characters.append(character)
         print("[%s] %s" % (datetime.now(), f"Found {character['name']}"))
 
-    # TODO: uncomment to download card images.
-    image_urls = [character['url'] for character in characters]
-    download_images(image_urls)
-
     return characters
 
 
@@ -61,13 +59,7 @@ def capitalize(text):
     return text
 
 
-def download_images(urls, dir_name='marvel-snap-cards'):
-    if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
-        print("[%s] %s" % (datetime.now(), f"Directory '{dir_name}' created."))
-    else:
-        print("[%s] %s" % (datetime.now(), f"Directory '{dir_name}' already exists."))
-
+def download_images(urls, dir_name):
     threads = []
     for url in urls:
         threads.append(Thread(target=download_image, args=(url, dir_name)))
@@ -92,24 +84,24 @@ def download_image(url, dir_name):
 
 
 def create_cards(cards):
+    data = {}
     for card in cards:
         if card["status"] != "released":
             return
 
-        body = {
+        data[card['id']] = {
+            "id": card["id"],
             "name": parse_name(card["name"]),
             "cost": card["cost"],
             "power": card["power"],
             "ability": parse_ability(card["name"], card["ability"]),
             "series": parse_source(card["source"]),
             "imageUrl": card["url"],
+            "imageName": card["url"].rsplit('/', 1)[-1],
         }
-
-        response = requests.post(CARDS_API_URL, json=body)
-        if response.status_code == requests.codes.created:
-            print("[%s] %s" % (datetime.now(), f"Created card: {card['name']}"))
-        else:
-            print("[%s] %s" % (datetime.now(), f"Failed to create card: {card['name']} - {response.text}"))
+    	
+    with open('{OUTPUT_DIR}/data.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
 
 def parse_name(name):
@@ -192,4 +184,12 @@ def parse_source(source):
 
 if __name__ == '__main__':
     characters = scrap()
-    # create_cards(characters)
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+        print("[%s] %s" % (datetime.now(), f"Directory '{OUTPUT_DIR}' created."))
+    else:
+        print("[%s] %s" % (datetime.now(), f"Directory '{OUTPUT_DIR}' already exists."))
+
+    image_urls = [character['url'] for character in characters if character["status"] == "released"] 
+    download_images(image_urls, OUTPUT_DIR)
+    create_cards(characters)
