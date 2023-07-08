@@ -156,12 +156,19 @@ def parse_ability(name, ability):
 
     for i in range(1, 10):
         # +[1-9] should be shown in bold and green color.
-        # -[1-9] should be shown in bold and red color.
         ability = re.sub(
             fr"[+][{i}]",
             f"<span class='fw-bold' style='color: green;'>+{i}</span>",
             ability,
         )
+        # -[1-9] should be shown in bold and red color.
+        ability = re.sub(
+            fr"[-][{i}]",
+            f"<span class='fw-bold' style='color: red;'>-{i}</span>",
+            ability,
+        )
+
+    return ability
 
 
 def parse_source(source):
