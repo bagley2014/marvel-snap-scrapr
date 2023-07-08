@@ -99,7 +99,7 @@ def create_cards(cards):
             "imageUrl": card["url"],
             "imageName": card["url"].rsplit('/', 1)[-1],
         }
-    	
+
     with open('{OUTPUT_DIR}/data.json', 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
@@ -190,6 +190,6 @@ if __name__ == '__main__':
     else:
         print("[%s] %s" % (datetime.now(), f"Directory '{OUTPUT_DIR}' already exists."))
 
-    image_urls = [character['url'] for character in characters if character["status"] == "released"] 
+    image_urls = [character['url'] for character in characters if character["status"] == "released"]
     download_images(image_urls, OUTPUT_DIR)
     create_cards(characters)
