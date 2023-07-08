@@ -87,7 +87,7 @@ def create_cards(cards):
     data = {}
     for card in cards:
         if card["status"] != "released":
-            return
+            continue
 
         data[card['id']] = {
             "id": card["id"],
@@ -100,7 +100,7 @@ def create_cards(cards):
             "imageName": card["url"].rsplit('/', 1)[-1],
         }
 
-    with open('{OUTPUT_DIR}/data.json', 'w', encoding='utf-8') as f:
+    with open(f'{OUTPUT_DIR}/data.json', 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 
